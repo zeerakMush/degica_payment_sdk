@@ -18,7 +18,7 @@ object RetrofitClient {
         .build()
 
 
-    val api: PaymentManagerGateway by lazy {
+    internal val api: PaymentManagerGateway by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(httpClient)

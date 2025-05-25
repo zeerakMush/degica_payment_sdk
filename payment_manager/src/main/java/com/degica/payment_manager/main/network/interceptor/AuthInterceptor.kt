@@ -4,7 +4,10 @@ import okhttp3.Interceptor
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class AuthInterceptor() : Interceptor {
+class AuthInterceptor : Interceptor {
+
+    //todo better protect the key used here, this is just for demo purposes
+
     @OptIn(ExperimentalEncodingApi::class)
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val request = chain.request().newBuilder()

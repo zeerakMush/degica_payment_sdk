@@ -1,6 +1,7 @@
 package com.degica.corepayment
 
 import android.os.Bundle
+import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +11,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.degica.corepayment.databinding.ActivityMainBinding
 import com.degica.payment_manager.main.PaymentManager
+import com.degica.payment_manager.main.core.PaymentState
 import com.degica.payment_manager.main.core.model.CreditCardPaymentDetails
 import com.degica.payment_manager.main.core.model.Currency
 import com.degica.payment_manager.main.core.model.PaymentData
@@ -32,19 +34,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun callApi() {
-        PaymentManager.createPaymentManager().createPayment(
+        val createPayment = PaymentManager.createPaymentManager().createPayment(
             PaymentData(
                 amount = 1,
-                currency = Currency.YEN,
+                currency = Currency.JPY,
                 paymentDetails = CreditCardPaymentDetails(
                     number = "4111111111111111",
                     name = "Taro Yamada",
                     month = "1",
                     year = "2028",
                     cvv = "123",
-                    email = "test@example.com"
+                    email = "test@example"
                 ),
             )
         )
+
+        when(createPayment){
+            is PaymentState.Authorized -> Toast.makeText(this, "success", Toast.LENGTH_SHORT).show()
+            is PaymentState.Failed -> Toast.makeText(this, createPayment.errorMessage, Toast.LENGTH_SHORT).show()
+        }
     }
 }

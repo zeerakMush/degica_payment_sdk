@@ -1,5 +1,8 @@
 package com.degica.payment_manager.main.network
 
+import com.degica.payment_manager.main.api.model.ApiError
+import com.degica.payment_manager.main.api.model.ErrorBody
+import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,15 +25,20 @@ class ApiCaller(
                 val data = response.body() as T
                 ApiResult.ApiSuccess(data)
             } else {
-                throw HttpException(response)
+                ApiResult.ApiFailure(
+                    throwable = HttpException(response),
+                    error = GsonBuilder().create()
+                        .fromJson(response.errorBody()?.string(), ErrorBody::class.java)
+                        .toApiError()
+                )
             }
         } catch (e: Exception) {
-            ApiResult.ApiFailure(e)
+            ApiResult.ApiFailure(e, ApiError(code = "Unknown", message = e.message ?: "Unknown error"))
         }
     }
 }
 
 sealed class ApiResult<T> {
-    data class ApiSuccess<T>(val response: T) : ApiResult<T>()
-    data class ApiFailure<T>(val throwable: Throwable) : ApiResult<T>()
+    internal data class ApiSuccess<T>(val response: T) : ApiResult<T>()
+    internal data class ApiFailure<T>(val throwable: Throwable, val error: ApiError?) : ApiResult<T>()
 }
