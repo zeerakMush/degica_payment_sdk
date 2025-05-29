@@ -8,6 +8,4 @@ sealed class PaymentState {
     data class Failed(
         val errorMessage: String
     ) : PaymentState()
-
-    //todo add more states as needed
 }

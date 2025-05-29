@@ -18,15 +18,13 @@ class PaymentManager(private val apiCaller: ApiCaller) {
     }
 
     suspend fun createPayment(paymentData: PaymentData): PaymentState {
-        // todo add repo layer here
-
         val request = PaymentDataApiModel(
             amount = paymentData.amount,
             currency = paymentData.currency.key,
             locale = paymentData.locale,
             paymentDetails = paymentData.paymentDetails.toMap(),
             capture = paymentData.capture,
-            fraudDetails = FraudDetailsApiModel( //todo: remove it and move to some config(it should not be passed with every request)
+            fraudDetails = FraudDetailsApiModel(
                 customerIp = "54.199.14.70",
                 customerEmail = "test@email.com"
             )
