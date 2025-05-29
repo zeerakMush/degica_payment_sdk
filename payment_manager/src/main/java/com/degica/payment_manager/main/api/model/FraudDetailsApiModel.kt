@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class FraudDetailsApiModel (
     @SerializedName("customer_ip")
-    val customerIp: String,
+    val customerIp: String?,
     @SerializedName("customer_email")
-    val customerEmail: String
+    val customerEmail: String?
 )

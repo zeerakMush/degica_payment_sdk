@@ -35,29 +35,41 @@ dependencies {
 
 ### Usage Example
 
+- Init the `DegicaPaymentManager` with your API key and customer details, 
 ```kotlin
-val paymentManager = PaymentManager.createPaymentManager()
-
-val paymentData = PaymentData(
-    amount = 1000,
-    currency = Currency.USD,
-    locale = "en_US",
-    paymentDetails = CreditCardPaymentDetails(
-        number = "4123111111111000",
-        month = "01",
-        year = "2028",
-        cvv = "123",
-        name = "Taro Yamada",
-        email = "test@example.com"
-    ),
-    capture = true
+val paymentManager = DegicaPaymentManager.createPaymentManager(
+    config = PaymentManagerConfig(
+        apiKey = "sk_test_7ka9dg6g8854o2buom5lwmc1",
+        customerIp = "54.199.14.70",
+        customerEmail = "test@email.com"
+    )
 )
+```
 
-suspend fun makePayment() {
-    when (val result = paymentManager.createPayment(paymentData)) {
-        is PaymentState.Authorized -> println("Payment authorized: ${result.paymentId}")
-        is PaymentState.Failed -> println("Payment failed: ${result.reason}")
-    }
+- Then create a payment using `paymentManager.paymentProcessor` 
+```kotlin
+ val paymentResponse = paymentManager.paymentProcessor.createPayment(
+    PaymentData(
+        amount = 1,
+        currency = Currency.JPY,
+        paymentDetails = CreditCardPaymentDetails(
+            number = "4111111111111111",
+            name = "Taro Yamada",
+            month = "1",
+            year = "2028",
+            cvv = "123",
+            email = "test@example.com"
+        ),
+    )
+)
+```
+
+- Handle the payment response:
+
+```kotlin
+when (paymentResponse) {
+    is PaymentState.Authorized -> println("Payment authorized: ${paymentResponse.paymentId}")
+    is PaymentState.Failed -> println("Payment failed: ${paymentResponse.reason}")
 }
 ```
 

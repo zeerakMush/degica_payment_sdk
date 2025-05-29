@@ -2,19 +2,15 @@ package com.degica.corepayment
 
 import android.os.Bundle
 import android.widget.Toast
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import com.degica.corepayment.databinding.ActivityMainBinding
-import com.degica.payment_manager.main.PaymentManager
+import com.degica.payment_manager.main.DegicaPaymentManager
 import com.degica.payment_manager.main.core.PaymentState
 import com.degica.payment_manager.main.core.model.CreditCardPaymentDetails
 import com.degica.payment_manager.main.core.model.Currency
 import com.degica.payment_manager.main.core.model.PaymentData
+import com.degica.payment_manager.main.core.model.PaymentManagerConfig
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +30,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun callApi() {
-        val createPayment = PaymentManager.createPaymentManager().createPayment(
+        val paymentManager = DegicaPaymentManager.createPaymentManager(
+            config = PaymentManagerConfig(
+                apiKey = "sk_test_7ka9dg6g8854o2buom5lwmc1",
+                customerIp = "54.199.14.70",
+                customerEmail = "test@email.com"
+            )
+        )
+
+        val paymentResponse = paymentManager.paymentProcessor.createPayment(
             PaymentData(
                 amount = 1,
                 currency = Currency.JPY,
@@ -44,14 +48,14 @@ class MainActivity : AppCompatActivity() {
                     month = "1",
                     year = "2028",
                     cvv = "123",
-                    email = "test@example"
+                    email = "test@example.com"
                 ),
             )
         )
 
-        when(createPayment){
+        when(paymentResponse){
             is PaymentState.Authorized -> Toast.makeText(this, "success", Toast.LENGTH_SHORT).show()
-            is PaymentState.Failed -> Toast.makeText(this, createPayment.errorMessage, Toast.LENGTH_SHORT).show()
+            is PaymentState.Failed -> Toast.makeText(this, paymentResponse.errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
 }

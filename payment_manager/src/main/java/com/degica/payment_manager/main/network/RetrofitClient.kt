@@ -1,5 +1,6 @@
 package com.degica.payment_manager.main.network
 
+import com.degica.payment_manager.main.DegicaPaymentManager
 import com.degica.payment_manager.main.network.gateway.PaymentManagerGateway
 import com.degica.payment_manager.main.network.interceptor.AuthInterceptor
 import okhttp3.OkHttpClient
@@ -12,18 +13,23 @@ object RetrofitClient {
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
-    private val httpClient = OkHttpClient.Builder()
-        .addInterceptor(AuthInterceptor())
+    private fun  httpClient(apiKey: String) = OkHttpClient.Builder()
+        .addInterceptor(AuthInterceptor(apiKey))
         .addInterceptor(logging)
         .build()
 
-
-    internal val api: PaymentManagerGateway by lazy {
-        Retrofit.Builder()
+    private fun getRetrofit(apiKey: String): PaymentManagerGateway {
+        return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(httpClient)
+            .client(httpClient(apiKey))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(PaymentManagerGateway::class.java)
     }
+
+    internal val api: PaymentManagerGateway by lazy {
+        getRetrofit(DegicaPaymentManager.getInstance()?.config?.apiKey ?: throw IllegalStateException("PaymentManager not initialized"))
+    }
+
+
 }

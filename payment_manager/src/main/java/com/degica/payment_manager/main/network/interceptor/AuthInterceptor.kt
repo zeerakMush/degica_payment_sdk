@@ -4,11 +4,13 @@ import okhttp3.Interceptor
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class AuthInterceptor : Interceptor {
+class AuthInterceptor(
+    val apiKey: String
+) : Interceptor {
     @OptIn(ExperimentalEncodingApi::class)
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val request = chain.request().newBuilder()
-            .addHeader("authorization", "Basic ${Base64.Default.encode("sk_test_7ka9dg6g8854o2buom5lwmc1".encodeToByteArray())}")
+            .addHeader("authorization", "Basic ${Base64.Default.encode(apiKey.encodeToByteArray())}")
             .build()
         return chain.proceed(request)
     }
